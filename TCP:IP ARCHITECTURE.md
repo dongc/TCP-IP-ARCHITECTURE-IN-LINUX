@@ -13,7 +13,7 @@ timer. This means that for any of these timers, we reset the same timer, that is
 
 The timer is reset by calling tcp_reset_keepalive_timer() , which kicks off the keepalive timer registered as tp → timer for the TCP connection. This timer is initialized as tcp_keepalive_timer in tcp_init_xmit_timers() at the time of opening a socket. 
 
-###  tcp _ keepalive _ timer ()
+###  tcp_keepalive_timer()
 
 Let ’ s see how the keepalive timer functions. It fi rst looks for the user of the socket.If so, we need to let the user of the socket complete its task and defer execution of the timer at some later time. We reset keepalive timer by calling tcp_reset_keepalive_timer() to expire after HZ/20 ticks at line 584, release socket hold and leave (cs 10.29a ). The keepalive callback routine can act as a SYN - ACK timer by calling tcp_synack_timer() at line 589 to manage incoming connection request (discussed in Section 10.6.3 ), in case it is a listening socket. Next we check if the socket is in the FIN_WAIT2 state, and the socket is already closed at line 593. If that is the case, we call tcp_time_wait() in case we have not expired TCP_TIMEWAIT_LEN number of ticks.Otherwise if we have expired, we send out reset on the connection and remove the connection from our end. TIME_WAIT timer will be discussed in Section 10.7.2 .
 
@@ -26,3 +26,4 @@ Otherwise, if the time has actually expired, the next check would be to see if t
 
 If we have not exceeded the limit on the number of unacknowledged probes,
 we call tcp_write_wakeup() to send out a probe (see Section 10.3.7 ). If the probe segment is transmitted successfully, we increment the probe counter by 1 at line 625. 
+
